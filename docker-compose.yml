@@ -1,0 +1,41 @@
+version: '3.7'
+services:
+  nginx:
+    container_name: nginx-new_proj
+    build: docker/nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - php
+      - db
+    networks:
+      - php
+      - db
+    volumes:
+      - ./logs/nginx:/var/log/nginx
+      - ./public:/var/www/symfony/public
+  php:
+    container_name: php-fpm-new_proj
+    build: docker/php8.2-fpm
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/var/www/symfony
+    depends_on:
+      - db
+    networks:
+      - db
+      - php
+  db:
+    container_name: db-new_proj
+    build: docker/postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - db
+    ports:
+      - "5432:5432"
+networks:
+  db:
+  php:
